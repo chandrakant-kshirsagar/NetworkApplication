@@ -1,4 +1,9 @@
+import java.io.FileInputStream
 import java.net.URI
+import java.util.Properties
+
+include(":sharedTest")
+
 
 pluginManagement {
     repositories {
@@ -15,14 +20,14 @@ dependencyResolutionManagement {
         mavenCentral()
         maven { url = URI("https://jitpack.io") }
         val properties = File(rootDir, "local.properties").inputStream().use {
-            java.util.Properties().apply { load(it) }
+            Properties().apply { load(it) }
         }
         maven {
             credentials {
                 username = properties.getProperty("username")
                 password = properties.getProperty("password")
             }
-            url = URI(properties.getProperty("repoUrl"))
+            url = uri("https://maven.pkg.github.com/chandrakant-kshirsagar/NetworkApplication")
         }
     }
 

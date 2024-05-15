@@ -10,17 +10,17 @@ import com.devrex.networkapplication.domain.repository.RemoteRepository
 class RemoteRepositoryImpl : RemoteRepository {
     override suspend fun latestMovie(): Resource<MovieResponseDto> =
         NetworkCall().callGet(
-            ApiUrls.BASE_URL,
+            ApiUrls.SERVER_URL,
             "upcoming",
             hashMapOf("api_key" to ApiUrls.APP_KEY)
         )
 
     override suspend fun popularMovie(): Resource<MovieResponseDto> = NetworkCall().callGet(
-        ApiUrls.BASE_URL, "popular", hashMapOf("api_key" to ApiUrls.APP_KEY)
+        ApiUrls.SERVER_URL, "popular", hashMapOf("api_key" to ApiUrls.APP_KEY)
     )
 
     override suspend fun movieDetails(movieId: String): Resource<MovieDetailsResponseDto> =
         NetworkCall().callGet(
-            ApiUrls.BASE_URL, movieId,hashMapOf("api_key" to ApiUrls.APP_KEY)
+            ApiUrls.SERVER_URL, movieId,hashMapOf("api_key" to ApiUrls.APP_KEY)
         )
 }

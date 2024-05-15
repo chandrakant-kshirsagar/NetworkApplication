@@ -1,14 +1,12 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-import groovy.lang.GroovyObject
-import org.jfrog.gradle.plugin.artifactory.dsl.PublisherConfig
-import org.jfrog.gradle.plugin.artifactory.dsl.ResolverConfig
+import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     id("com.android.application")
     id("kotlin-android")
     id("kotlin-kapt")
     id("kotlin-parcelize")
-    id("com.jfrog.artifactory")
     id("maven-publish")
 }
 
@@ -51,18 +49,18 @@ android {
 
         debug {
             buildConfigField(
-                "String", "APP_KEY", gradleLocalProperties(rootDir).getProperty("APP_KEY")
+                "String", "APP_KEY", "\"909594533c98883408adef5d56143539\""
             )
             buildConfigField(
-                "String", "BASE_URL", gradleLocalProperties(rootDir).getProperty("BASE_URL")
+                "String", "BASE_URL", "\"https://api.themoviedb.org\""
             )
         }
         release {
             buildConfigField(
-                "String", "APP_KEY", gradleLocalProperties(rootDir).getProperty("APP_KEY")
+                "String", "APP_KEY", "\"909594533c98883408adef5d56143539\""
             )
             buildConfigField(
-                "String", "BASE_URL", gradleLocalProperties(rootDir).getProperty("BASE_URL")
+                "String", "BASE_URL", "\"https://api.themoviedb.org\""
             )
 
             isMinifyEnabled = false
@@ -82,106 +80,102 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
     }
-    repositories {
-        google()
-        mavenCentral()
-    }
+
 }
 
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(libs.androidx.navigation.common.ktx)
-    implementation(libs.androidx.navigation.runtime.ktx)
-    implementation (libs.androidx.navigation.compose)
-    implementation (libs.accompanist.navigation.animation)
-
-    implementation(libs.networksdk)
-
-
-    implementation(libs.retrofit)
-    implementation(libs.retrofit2.converter.scalars)
-    implementation(libs.converter.gson)
-
-    implementation(libs.okhttp)
-    implementation(libs.logging.interceptor)
-
-    implementation(libs.gson)
+    implementation(libs.navigation.compose)
+    // Added Maven repository
+    implementation("com.devrex:network-lib:1.0")
     implementation(libs.androidx.constraintlayout.compose)
-    implementation(libs.androidx.lifecycle.extensions)
-    implementation(libs.coil.compose)
-    implementation(libs.core.ktx)
-    implementation(libs.lifecycle.runtime.ktx)
+    implementation(libs.coil.compose.v260)
+    implementation(libs.androidx.core.ktx)
     implementation(libs.activity.compose)
+    implementation(libs.compose.foundation)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.ui.tooling.preview)
     implementation(platform(libs.compose.bom))
-    implementation(libs.ui)
-    implementation(libs.ui.graphics)
-    implementation(libs.ui.tooling.preview)
-    implementation(libs.material3)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.test.ext.junit)
-    androidTestImplementation(libs.espresso.core)
-    androidTestImplementation(platform(libs.compose.bom))
-    androidTestImplementation(libs.ui.test.junit4)
-    debugImplementation(libs.ui.tooling)
-    debugImplementation(libs.ui.test.manifest)
-}
-val packageName = "com.devrev.network"
-val libVersion = "1.0.1"
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.graphics)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.compose.runtime.livedata)
+    implementation(libs.lifecycle.runtime)
+    implementation(libs.navigation.compose)
+    implementation(libs.gson)
+    //TODO  uncomment for testing
+/*    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.scalars)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.interceptor)*/
+    implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.compose.ui.text.googleFonts)
 
+    implementation(libs.androidx.compose.ui.tooling)
+    testImplementation(project(":sharedTest"))
+    androidTestImplementation(project(":sharedTest"))
+
+    testImplementation(libs.junit4)
+    androidTestImplementation(platform(libs.androidx.test.junit4))
+    androidTestImplementation(platform(libs.androidx.test.espresso.core))
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.androidx.compose.ui.test.manifest)
+
+    testImplementation(libs.test.ext.junit)
+}
 fun depencyList(): List<Dependency> {
     return arrayListOf(
-        libs.retrofit.get(),
-        libs.retrofit2.converter.scalars.get(),
-        libs.converter.gson.get(),
-        libs.okhttp.get(),
-        libs.logging.interceptor.get()
+        libs.retrofit.asProvider().get(),
+        libs.retrofit.converter.scalars.get(),
+        libs.retrofit.converter.gson.get(),
+        libs.okhttp.asProvider().get(),
+        libs.okhttp.interceptor.get()
     )
 }
 
+
 publishing {
     publications {
-        create<MavenPublication>("mavenJava") {
-            groupId = packageName
-            artifactId = "networksdk"
-            version = libVersion
-
+        create<MavenPublication>("release") {
+            groupId = "com.devrex"
+            artifactId = "network-lib"
+            version = "1.0"
             artifact("$rootDir/app/libs/network-release.aar")
             pom {
-                withXml {
-                    asNode().appendNode("dependencies")?.let { node ->
-                        depencyList().forEach {
-                            node.appendNode("dependency").apply {
-                                appendNode("groupId", it.group)
-                                appendNode("artifactId", it.name)
-                                appendNode("version", it.version)
+                pom {
+                    withXml {
+                        asNode().appendNode("dependencies")?.let { node ->
+                            depencyList().forEach {
+                                node.appendNode("dependency").apply {
+                                    appendNode("groupId", it.group)
+                                    appendNode("artifactId", it.name)
+                                    appendNode("version", it.version)
+                                }
                             }
                         }
                     }
                 }
             }
         }
+
+
     }
-}
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/chandrakant-kshirsagar/NetworkApplication")
+            credentials {
+                val properties = File(rootDir, "local.properties").inputStream().use {
+                    Properties().apply { load(it) }
+                }
+                username =properties.getProperty("username")
+                password = properties.getProperty("password")
+            }
+        }
 
-artifactory {
-    setContextUrl("https://kshirsagar.jfrog.io/artifactory")
-    publish(delegateClosureOf<PublisherConfig> {
-        repository(delegateClosureOf<GroovyObject> {
-            setProperty("repoKey", gradleLocalProperties(rootDir).getProperty("repoKey"))
-            setProperty("username", gradleLocalProperties(rootDir).getProperty("username"))
-            setProperty("password", gradleLocalProperties(rootDir).getProperty("password"))
-        })
-        defaults(delegateClosureOf<GroovyObject> {
-
-            invokeMethod("publications", "mavenJava")
-            setProperty("publishPom", true)
-            setProperty("publishIvy", true)
-            setProperty("publishArtifacts", true)
-
-        })
-    })
-    resolve(delegateClosureOf<ResolverConfig> {
-        setProperty("repoKey", gradleLocalProperties(rootDir).getProperty("repoKey"))
-    })
+    }
 }

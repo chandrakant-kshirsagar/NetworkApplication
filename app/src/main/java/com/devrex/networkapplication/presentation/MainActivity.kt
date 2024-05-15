@@ -9,9 +9,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.devrex.networkapplication.presentation.navigation.NavGraph
 import com.devrex.networkapplication.presentation.ui.theme.NetworkApplicationTheme
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
 class MainActivity : ComponentActivity() {
     var navController: NavHostController? = null
@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
 
-                    val navController = rememberAnimatedNavController()
+                    val navController = rememberNavController()
                     NavGraph(navController = navController, activity = this, modifier = Modifier)
                 }
             }

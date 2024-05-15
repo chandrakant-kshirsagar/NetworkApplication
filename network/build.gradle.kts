@@ -38,10 +38,10 @@ android {
         jvmTarget = "1.8"
     }
 
-    /* afterEvaluate {
+     afterEvaluate {
          tasks.getByName("assembleDebug").finalizedBy("copyAARDebug")
          tasks.getByName("assembleRelease").finalizedBy("copyAARRelease")
-     }*/
+     }
 }
 tasks.register("copyAARDebug", Copy::class) {
     from(listOf(buildDir.absolutePath, "outputs", "aar").joinToString(File.separator))
@@ -57,16 +57,17 @@ tasks.register("copyAARRelease", Copy::class) {
 dependencies {
 
     implementation(libs.retrofit)
-    implementation(libs.retrofit2.converter.scalars)
-    implementation(libs.converter.gson)
+    implementation(libs.retrofit.converter.scalars)
+    implementation(libs.retrofit.converter.gson)
 
     implementation(libs.okhttp)
-    implementation(libs.logging.interceptor)
+    implementation(libs.okhttp.interceptor)
 
-    implementation(libs.core.ktx)
-    implementation(libs.appcompat)
-    implementation(libs.material)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.test.ext.junit)
-    androidTestImplementation(libs.espresso.core)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.compose.material3)
+    implementation(libs.test.ext.junit)
+    testImplementation(libs.junit4)
+    testImplementation(libs.junit4.ktx)
+    androidTestImplementation(platform(libs.androidx.test.junit4))
+    androidTestImplementation(platform(libs.androidx.test.espresso.core))
 }

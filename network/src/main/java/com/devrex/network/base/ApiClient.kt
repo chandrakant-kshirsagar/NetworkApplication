@@ -1,7 +1,6 @@
 package com.devrex.network.base
 
 import com.devrex.network.BuildConfig
-import com.devrex.network.retrofit.SafeRestCallBack
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit

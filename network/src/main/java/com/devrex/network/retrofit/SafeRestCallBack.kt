@@ -65,7 +65,7 @@ class SafeRestCallBack {
         return parseSafeRestCallBack(response)
     }
 
-    internal inline fun <reified T> parseSafeRestCallBack(response: Response<ResponseBody>?): Resource<T> {
+     inline fun <reified T> parseSafeRestCallBack(response: Response<ResponseBody>?): Resource<T> {
         try {
             if (response?.isSuccessful == true) {
                 return if (response.body() != null) {
@@ -91,7 +91,7 @@ class SafeRestCallBack {
 
     }
 
-    private inline fun <reified T> parseResponse(response: String?): Resource<T> {
+    inline fun <reified T> parseResponse(response: String?): Resource<T> {
         return when (T::class.java) {
             String::class.java -> Resource.Success(data = response as? T)
             JSONObject::class.java -> Resource.Success(data = JSONObject(response.toString()) as? T)
@@ -103,7 +103,7 @@ class SafeRestCallBack {
         }
     }
 
-    private inline fun <reified T> parseErrorResponse(response: String?): Resource<T> {
+    inline fun <reified T> parseErrorResponse(response: String?): Resource<T> {
         return try {
             Resource.Error(Gson().fromJson(response, ApiError::class.java))
         } catch (e: Exception) {
